@@ -1,0 +1,74 @@
+FROM ubuntu:18.04
+WORKDIR /application
+ARG PYTHON_VERSION
+ENV DEBIAN_FRONTEND noninteractive
+RUN if [ "$PYTHON_VERSION" = "3.8" ]; then \
+	        apt-get update && apt-get install -y \
+            software-properties-common \          
+		    curl \
+            wget \
+            && add-apt-repository ppa:deadsnakes/ppa -y \
+            && apt-get update && apt-get install -y python${PYTHON_VERSION} \
+            python3-setuptools \
+             pylint \
+            python3-dev \
+		    gcc \
+		    g++ \
+            && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py \
+            && python3.8 get-pip.py \
+            && apt-get remove -y curl wget \      
+            && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10 \
+            && python3.8 -m pip install --upgrade setuptools \
+            && python3.8 -m pip install pylint \
+            && python3.8 -m pip install wheel \
+            && python3.8 -m pip install scipy \
+            && python3.8 -m pip install matplotlib \
+            && python3.8 -m pip install numphy \
+            && python3.8 -m pip install pandas \
+		    && python3.8 -m pip install pytest nbmake && rm -rf /var/lib/apt/lists/*; \         
+	else \
+		    apt-get update && apt-get install -y \
+            build-essential \
+            libssl-dev \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libreadline-dev \
+            libsqlite3-dev \
+            libgdbm-dev \
+            libdb5.3-dev \
+            libbz2-dev \
+            libexpat1-dev \
+            liblzma-dev \
+            libffi-dev \
+            uuid-dev \
+            wget \
+            #libnss3-dev \
+		    curl \
+            && wget --no-check-certificate https://www.python.org/ftp/python/${PYTHON_VERSION}.1/Python-${PYTHON_VERSION}.1.tgz \
+            && tar -xf Python-${PYTHON_VERSION}.1.tgz \
+            && cd Python-${PYTHON_VERSION}.1 \
+            && ./configure \
+		    && make -j 12 \
+            && make altinstall \
+            && cd .. \
+            && rm -rf Python-${PYTHON_VERSION}.1.tgz \
+            && rm -rf Python-${PYTHON_VERSION}.1 \
+            apt-get update && apt-get install -y \
+		    python3-setuptools \
+		    pylint \
+		    python3-dev \
+		    gcc \
+		    g++ \
+            && curl https://bootstrap.pypa.io/get-pip.py --output get-pip.py \
+            && python${PYTHON_VERSION} get-pip.py \
+            && apt-get remove -y curl wget \    
+            && python3.9 -m pip install --no-cache-dir pylint \
+            && python3.9 -m pip install --no-cache-dir wheel \
+            #&& python3.9 -m pip install --no-cache-dir scipy \
+            #&& python3.9 -m pip install --no-cache-dir matplotlib \
+            #&& python3.9 -m pip install --no-cache-dir numphy \
+            #&& python3.9 -m pip install --no-cache-dir pandas \
+            && python3.9 -m pip install --no-cache-dir --upgrade setuptools \
+		    && python3.9 -m pip install --no-cache-dir pytest nbmake && rm -rf /var/lib/apt/lists/*; \
+	fi
